@@ -1,0 +1,74 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-uv:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        dirs: ["repo1"]
+    defaults:
+      run:
+        working-directory: ${{ matrix.dirs }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: "${{ matrix.dirs }}/pyproject.toml"
+
+      - uses: astral-sh/setup-uv@v3
+
+      - run: |
+          uv lock
+          uv pip list
+
+  test-pdm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        dirs: ["repo1"]
+    defaults:
+      run:
+        working-directory: ${{ matrix.dirs }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: "${{ matrix.dirs }}/pyproject.toml"
+
+      - uses: pdm-project/setup-pdm@v4
+
+      - run: |
+          pdm lock
+          pdm list
+
+  test-poetry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        dirs: ["repo1"]
+    defaults:
+      run:
+        working-directory: ${{ matrix.dirs }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: "${{ matrix.dirs }}/pyproject.toml"
+
+      - uses: abatilo/actions-poetry@v2
+
+      - run: |
+          poetry lock
+          pip list
